@@ -67,6 +67,8 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     for (const asset of ['assets/images/ball-red.svg', 'assets/images/ball-green.svg', 'assets/images/ball-red-violet.svg', 'assets/images/ball-green-violet.svg']) {
       assert.equal((await fetch(`${base}/${asset}`)).status, 200);
     }
+    assert.equal((await fetch(`${base}/css/wingo.css`)).status, 200);
+    assert.equal(await evaluate("document.querySelectorAll('.review-history .review-row').length"), 2, 'Win and loss illustrations both remain visible');
     for (const privatePath of ['/.git/config', '/README.md', '/ref_components/history.png', '/package.json', '/tools/serve.mjs']) {
       assert.equal((await fetch(base + privatePath)).status, 404, `${privatePath} remains outside public files`);
     }
@@ -84,6 +86,7 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     for (const width of [1440, 1024, 768, 600, 393, 320]) {
       await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width <= 600 });
       assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, `${width}px: no horizontal overflow`);
+      assert.equal(await evaluate("[...document.querySelectorAll('.category-card, .review-history, .insight-card')].every(el => el.scrollWidth <= el.clientWidth + 1)"), true, `${width}px: reference components fit their panels`);
     }
     await send('Emulation.setDeviceMetricsOverride', { width: 393, height: 852, deviceScaleFactor: 1, mobile: true });
     await evaluate("document.querySelector('.menu-toggle').click()");
@@ -92,6 +95,11 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     assert.equal(await evaluate("document.querySelector('.menu-toggle').getAttribute('aria-expanded')"), 'false');
     await sleep(900);
     assert.equal(await evaluate('location.hash'), '#course');
+    await waitFor("document.querySelector('#navigation a[aria-current]')?.getAttribute('href') === '#course'");
+    assert.equal(await evaluate("Math.abs(document.querySelector('.header').getBoundingClientRect().top) < 1"), true, 'Navigation remains available while scrolling');
+    await evaluate("document.querySelector('.menu-toggle').click()");
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    assert.equal(await evaluate("document.querySelector('.menu-toggle').getAttribute('aria-expanded')"), 'false');
     await evaluate("document.querySelectorAll('.curriculum summary')[2].click()");
     assert.equal(await evaluate("document.querySelectorAll('.curriculum details')[2].open"), true);
     await evaluate("document.querySelector('.faq-list summary').click()");
@@ -104,6 +112,14 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await waitFor("!document.documentElement.classList.contains('js-motion')");
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.specimen')).animationName"), 'none');
     assert.equal(await evaluate("[...document.querySelectorAll('.reveal')].every(el=>getComputedStyle(el).opacity === '1')"), true);
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.chart-line')).animationName"), 'none');
+    // The course and native disclosure content also work with scripts disabled.
+    await send('Emulation.setScriptExecutionDisabled', { value: true });
+    await send('Page.navigate', { url: base });
+    await sleep(500);
+    await send('Emulation.setScriptExecutionDisabled', { value: false });
+    await waitFor("document.readyState === 'complete'");
+    assert.equal(await evaluate("[...document.querySelectorAll('.reveal')].every(el=>getComputedStyle(el).opacity === '1')"), true, 'No-script visitors can read every section');
     assert.deepEqual(errors, [], 'No uncaught JavaScript errors');
     console.log('Verified six viewport widths, section links, course-only scope, mobile menu, accordions, reduced motion, assets, and public-file boundaries.');
   } finally {

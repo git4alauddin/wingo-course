@@ -14,6 +14,9 @@ menuButton.addEventListener('click', () => {
 navigation.addEventListener('click', event => {
   if (event.target.closest('a')) closeMenu();
 });
+document.addEventListener('click', event => {
+  if (!event.target.closest('.header')) closeMenu();
+});
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
     closeMenu();
@@ -48,9 +51,19 @@ progress.className = 'reading-progress';
 progress.setAttribute('aria-hidden', 'true');
 document.body.append(progress);
 let pending = false;
+const sectionLinks = [...navigation.querySelectorAll('a:not(.button)')].map(link => ({
+  link,
+  section: document.querySelector(link.getAttribute('href')),
+}));
 function updateProgress() {
   const length = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.transform = `scaleX(${length > 0 ? Math.min(1, Math.max(0, window.scrollY / length)) : 0})`;
+  const headerOffset = document.querySelector('.header').offsetHeight + 100;
+  const current = sectionLinks.filter(({ section }) => section.getBoundingClientRect().top <= headerOffset).at(-1);
+  sectionLinks.forEach(({ link }) => {
+    if (link === current?.link) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+  });
   pending = false;
 }
 window.addEventListener('scroll', () => {

@@ -24,6 +24,8 @@ The build copies public files to `dist/`; it does not deploy. Browser checks req
 
 Emerald-and-gold course page with the original ball artwork, static category/history/chart illustrations, expandable curriculum and FAQs, mobile navigation, scroll reveals, and reduced-motion support.
 
+The WinGo polish adds emerald category panels, orange/blue size badges, a hero result sequence, and a personal-history illustration with both wins and losses. The chart draws once on entry, navigation stays available while scrolling, and the active section is indicated. Initial lesson access through restricted Google Drive sharing is described in the FAQ; Drive links and enrollment are not yet configured.
+
 The temporary brand name is **WinGo Study**. The curriculum is proposed copy for review. All course CTAs point to the course outline until a destination is supplied. Enrollment and pricing are not configured. Google Fonts supplies DM Sans and Manrope when online; system fallbacks remain available.
 
 ## References
