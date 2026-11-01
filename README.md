@@ -18,7 +18,9 @@ npm test
 npm run build
 ```
 
-The build renders the configured page and copies public files to `dist/`; it does not deploy. Browser checks require local Chrome or Edge (or `CHROME_PATH`) and save screenshots in ignored `preview/`.
+Use `npm run preview` to build and preview the exact `dist/` files used for deployment.
+
+The build renders the configured page, refreshes the root `index.html`, and copies public files to `dist/`; it does not deploy. The root page is a generated static fallback for ordinary preview servers. Browser checks require local Chrome or Edge (or `CHROME_PATH`) and save screenshots in ignored `preview/`.
 
 ## Two configuration files
 
@@ -31,9 +33,9 @@ Edit the JSON values and save. Refresh the local site to see changes; no server 
 
 Set `course.url` to a full `https://...` URL when ready; it updates all four main course buttons. The default `#course` leads to the course overview. Navigation and secondary curriculum links stay on the page. Update `status`, `enrollmentAnswer`, and `accessAnswer` to match the actual enrollment process.
 
-Colors accept six-digit hex values. Motion switches accept `true` or `false`; visitors' reduced-motion preferences always take priority. Curriculum paragraphs and layout remain in `index.html` to keep configuration compact. That source file is now a template; use `npm start` rather than opening it directly.
+Colors accept six-digit hex values. Motion switches accept `true` or `false`; visitors' reduced-motion preferences always take priority. Curriculum paragraphs and layout remain in `templates/index.html` to keep configuration compact. Edit that template for layout/content changes; do not edit the generated root page. `npm start` renders it live. For any other static preview server, run `npm run build` after configuration changes so the root page is refreshed.
 
-For **Cloudflare Pages**, use build command `npm run build` and output directory **`dist`**. Deploy the generated `dist/` contents rather than the raw template. Configuration files and development tools are not copied into the public build.
+For **Cloudflare Pages**, use build command `npm run build` and output directory **`dist`** (also declared in `wrangler.jsonc`). Set the project root to this repository's root. Deploy the generated `dist/` contents rather than `templates/`. Configuration files, source templates, and development tools are not copied into the public build. If you see literal `{{site...}}` text or a white hero, an old raw-template deployment is being served: correct the build settings and redeploy the latest commit.
 
 ## Content and behavior
 

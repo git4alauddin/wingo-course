@@ -35,7 +35,7 @@ export async function renderPage(configuration) {
   } catch {}
   if (!validAnchor && !validWebUrl) throw new Error('site.course.url must be a section anchor or an http(s) URL.');
 
-  const template = await readFile(resolve(root, 'index.html'), 'utf8');
+  const template = await readFile(resolve(root, 'templates/index.html'), 'utf8');
   if (validAnchor && !template.includes(`id="${url.slice(1)}"`)) throw new Error(`Course destination ${url} does not exist on the page.`);
   return template.replace(/\{\{([\w.]+)\}\}/g, (_, key) => {
     const value = key.split('.').reduce((current, part) => current?.[part], configuration);

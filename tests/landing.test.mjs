@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { startServer } from '../tools/serve.mjs';
+import { loadConfiguration } from '../tools/render.mjs';
 
 test('course-only page: navigation, responsive layouts, and motion', { timeout: 90000 }, async () => {
   const executable = [process.env.CHROME_PATH, 'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(file => file && fs.existsSync(file));
@@ -15,6 +16,8 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
   browser.stderr.on('data', chunk => { diagnostics += chunk; });
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
   const server = await startServer(0);
+  const builtServer = await startServer(0, { built: true });
+  const configuration = await loadConfiguration();
   const base = `http://127.0.0.1:${server.address().port}`;
   let socket;
   const errors = [];
@@ -61,7 +64,7 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await waitFor("document.readyState === 'complete' && !!document.querySelector('.reading-progress')");
     await evaluate('document.fonts.ready');
     await sleep(1300);
-    assert.equal(await evaluate("document.querySelector('.hero-description').textContent.startsWith('There’s more')"), true, 'Unicode typography stays intact');
+    assert.equal(await evaluate("document.querySelector('.hero-description').textContent"), configuration.site.hero.description, 'Configured copy and Unicode typography stay intact');
     assert.equal(await evaluate("document.documentElement.outerHTML.includes('{{')"), false, 'Server resolves configuration before sending HTML');
     assert.equal(await evaluate("document.querySelector('.education-notice').textContent.includes('educational course')"), true);
     assert.equal(await evaluate('document.querySelectorAll("form, input, select, dialog, canvas").length'), 0, 'No playable simulations, calculators, or quizzes');
@@ -71,7 +74,7 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     }
     assert.equal((await fetch(`${base}/css/wingo.css`)).status, 200);
     assert.equal(await evaluate("document.querySelectorAll('.review-history .review-row').length"), 2, 'Win and loss illustrations both remain visible');
-    for (const privatePath of ['/.git/config', '/README.md', '/ref_components/history.png', '/package.json', '/tools/serve.mjs', '/config/site.json', '/config/disclosures.json']) {
+    for (const privatePath of ['/.git/config', '/README.md', '/ref_components/history.png', '/package.json', '/tools/serve.mjs', '/config/site.json', '/config/disclosures.json', '/templates/index.html']) {
       assert.equal((await fetch(base + privatePath)).status, 404, `${privatePath} remains outside public files`);
     }
     const screenshot = async (name, full = false) => {
@@ -129,12 +132,22 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await waitFor("document.readyState === 'complete'");
     assert.equal(await evaluate("[...document.querySelectorAll('.reveal')].every(el=>getComputedStyle(el).opacity === '1')"), true, 'No-script visitors can read every section');
     assert.equal(await evaluate("document.querySelector('.education-notice').textContent.includes('does not offer real-money gambling')"), true, 'Full educational disclosure remains present without scripts');
+    // Check the exact static artifact that Cloudflare will publish, not only the dev renderer.
+    await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+    await send('Page.navigate', { url: `http://127.0.0.1:${builtServer.address().port}/` });
+    await waitFor("document.readyState === 'complete' && !!document.querySelector('.reading-progress')");
+    assert.equal(await evaluate("document.documentElement.outerHTML.includes('{{')"), false, 'Deployment artifact contains no template markers');
+    assert.equal(await evaluate("document.querySelector('#hero-title').textContent"), configuration.site.hero.firstLine + configuration.site.hero.secondLine + configuration.site.hero.emphasis);
+    assert.equal(await evaluate("getComputedStyle(document.documentElement).getPropertyValue('--forest').trim()"), configuration.site.theme.forest);
+    assert.equal(await evaluate("document.querySelector('.education-notice p').textContent"), configuration.disclosures.noticeText);
+    await screenshot('deployment-hero');
     assert.deepEqual(errors, [], 'No uncaught JavaScript errors');
     console.log('Verified six viewport widths, section links, course-only scope, mobile menu, accordions, reduced motion, assets, and public-file boundaries.');
   } finally {
     socket?.close();
     browser.kill();
     await new Promise(resolve => server.close(resolve));
+    await new Promise(resolve => builtServer.close(resolve));
     const temporaryRoot = path.resolve(os.tmpdir()) + path.sep;
     if (path.resolve(profile).startsWith(temporaryRoot) && path.basename(profile).startsWith('wingo-course-qa-')) {
       try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 }); } catch {}

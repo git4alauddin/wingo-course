@@ -1,6 +1,19 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
 import { renderPage, loadConfiguration } from '../tools/render.mjs';
+
+test('root and deployment HTML are fully rendered static entry points', async () => {
+  const expected = await renderPage();
+  for (const file of ['index.html', 'dist/index.html']) {
+    const html = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
+    assert.ok(!/\{\{[\w.]+\}\}/.test(html), `${file} must not expose template placeholders`);
+    assert.equal(html, expected, `${file} must reflect the latest configuration; run npm run build`);
+  }
+  const published = await readdir(new URL('../dist/', import.meta.url));
+  assert.ok(!published.includes('templates'));
+  assert.ok(!published.includes('config'));
+});
 
 test('both configuration files render complete, knowledge-first static HTML', async () => {
   const config = await loadConfiguration();
