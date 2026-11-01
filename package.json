@@ -1,0 +1,13 @@
+{
+  "name": "wingo-course",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check js/app.js && node --check tools/serve.mjs && node --check tools/build.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

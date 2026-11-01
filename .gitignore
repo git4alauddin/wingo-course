@@ -8,6 +8,7 @@
 node_modules/
 dist/
 coverage/
+preview/
 
 # Local environment and logs
 .env
