@@ -35,7 +35,11 @@ Set `course.url` to a full `https://...` URL when ready; it updates all four mai
 
 Colors accept six-digit hex values. Motion switches accept `true` or `false`; visitors' reduced-motion preferences always take priority. Curriculum paragraphs and layout remain in `templates/index.html` to keep configuration compact. Edit that template for layout/content changes; do not edit the generated root page. `npm start` renders it live. For any other static preview server, run `npm run build` after configuration changes so the root page is refreshed.
 
-For **Cloudflare Pages**, use build command `npm run build` and output directory **`dist`** (also declared in `wrangler.jsonc`). Set the project root to this repository's root. Deploy the generated `dist/` contents rather than `templates/`. Configuration files, source templates, and development tools are not copied into the public build. If you see literal `{{site...}}` text or a white hero, an old raw-template deployment is being served: correct the build settings and redeploy the latest commit.
+For the current **Cloudflare Workers** pipeline, keep build command **`npm run build`** and deploy command **`npx wrangler deploy`**. The root `wrangler.jsonc` declares `assets.directory` as `./dist`, so Wrangler uploads the generated static site without a Worker script. Set the project root to this repository's root.
+
+If you deliberately use **Cloudflare Pages** instead, use build command `npm run build` and output directory `dist` in its dashboard. The tracked Wrangler configuration targets Workers, so use a Pages-specific configuration for that separate workflow rather than mixing Pages settings with `wrangler deploy`.
+
+Deploy the generated `dist/` contents rather than `templates/`. Configuration files, source templates, and development tools are not copied into the public build. If you see literal `{{site...}}` text or a white hero, an old raw-template deployment is being served: correct the build settings and redeploy the latest commit.
 
 ## Content and behavior
 

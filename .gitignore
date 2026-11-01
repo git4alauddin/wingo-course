@@ -9,6 +9,7 @@ node_modules/
 dist/
 coverage/
 preview/
+.wrangler/
 
 # Local environment and logs
 .env
