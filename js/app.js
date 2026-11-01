@@ -1,5 +1,6 @@
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#navigation');
+const settings = document.documentElement.dataset;
 
 function closeMenu() {
   menuButton.setAttribute('aria-expanded', 'false');
@@ -27,7 +28,7 @@ window.matchMedia('(min-width: 601px)').addEventListener('change', closeMenu);
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 // Without JavaScript or IntersectionObserver, every section remains visible.
-if ('IntersectionObserver' in window && !reduceMotion.matches) {
+if ('IntersectionObserver' in window && !reduceMotion.matches && settings.scrollReveals !== 'false') {
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) {
       if (entry.isIntersecting) {

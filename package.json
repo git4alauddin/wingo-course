@@ -7,7 +7,7 @@
     "start": "node tools/serve.mjs",
     "build": "node tools/build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check js/app.js && node --check tools/serve.mjs && node --check tools/build.mjs"
+    "check": "node --check js/app.js && node --check tools/serve.mjs && node --check tools/build.mjs && node --check tools/render.mjs"
   },
   "engines": { "node": ">=22" }
 }

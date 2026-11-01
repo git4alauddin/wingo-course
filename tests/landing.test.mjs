@@ -62,6 +62,8 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await evaluate('document.fonts.ready');
     await sleep(1300);
     assert.equal(await evaluate("document.querySelector('.hero-description').textContent.startsWith('There’s more')"), true, 'Unicode typography stays intact');
+    assert.equal(await evaluate("document.documentElement.outerHTML.includes('{{')"), false, 'Server resolves configuration before sending HTML');
+    assert.equal(await evaluate("document.querySelector('.education-notice').textContent.includes('educational course')"), true);
     assert.equal(await evaluate('document.querySelectorAll("form, input, select, dialog, canvas").length'), 0, 'No playable simulations, calculators, or quizzes');
     assert.deepEqual(await evaluate("[...document.querySelectorAll('a[href^=\"#\"]')].filter(a => a.hash && !document.getElementById(a.hash.slice(1))).map(a => a.hash)"), [], 'All section links have destinations');
     for (const asset of ['assets/images/ball-red.svg', 'assets/images/ball-green.svg', 'assets/images/ball-red-violet.svg', 'assets/images/ball-green-violet.svg']) {
@@ -69,7 +71,7 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     }
     assert.equal((await fetch(`${base}/css/wingo.css`)).status, 200);
     assert.equal(await evaluate("document.querySelectorAll('.review-history .review-row').length"), 2, 'Win and loss illustrations both remain visible');
-    for (const privatePath of ['/.git/config', '/README.md', '/ref_components/history.png', '/package.json', '/tools/serve.mjs']) {
+    for (const privatePath of ['/.git/config', '/README.md', '/ref_components/history.png', '/package.json', '/tools/serve.mjs', '/config/site.json', '/config/disclosures.json']) {
       assert.equal((await fetch(base + privatePath)).status, 404, `${privatePath} remains outside public files`);
     }
     const screenshot = async (name, full = false) => {
@@ -108,6 +110,12 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await sleep(900);
     await screenshot('mobile-hero');
     await screenshot('mobile-full', true);
+    await evaluate("document.documentElement.dataset.floatingArtwork = 'false'; document.documentElement.dataset.chartAnimation = 'false'; document.documentElement.dataset.smoothScroll = 'false'; document.documentElement.dataset.readingProgress = 'false'");
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.specimen')).animationName"), 'none', 'Artwork motion can be disabled separately');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.chart-line')).animationName"), 'none');
+    assert.equal(await evaluate("getComputedStyle(document.documentElement).scrollBehavior"), 'auto');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.reading-progress')).display"), 'none');
+    await evaluate("document.documentElement.dataset.floatingArtwork = 'true'; document.documentElement.dataset.chartAnimation = 'true'; document.documentElement.dataset.smoothScroll = 'true'; document.documentElement.dataset.readingProgress = 'true'");
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
     await waitFor("!document.documentElement.classList.contains('js-motion')");
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.specimen')).animationName"), 'none');
@@ -120,6 +128,7 @@ test('course-only page: navigation, responsive layouts, and motion', { timeout: 
     await send('Emulation.setScriptExecutionDisabled', { value: false });
     await waitFor("document.readyState === 'complete'");
     assert.equal(await evaluate("[...document.querySelectorAll('.reveal')].every(el=>getComputedStyle(el).opacity === '1')"), true, 'No-script visitors can read every section');
+    assert.equal(await evaluate("document.querySelector('.education-notice').textContent.includes('does not offer real-money gambling')"), true, 'Full educational disclosure remains present without scripts');
     assert.deepEqual(errors, [], 'No uncaught JavaScript errors');
     console.log('Verified six viewport widths, section links, course-only scope, mobile menu, accordions, reduced motion, assets, and public-file boundaries.');
   } finally {

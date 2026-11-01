@@ -1,0 +1,39 @@
+{
+  "brand": {
+    "name": "WinGo Study",
+    "wordmark": "wingo",
+    "suffix": "/ study"
+  },
+  "seo": {
+    "title": "WinGo Study — Look closer. Think in numbers.",
+    "description": "An educational WinGo course exploring game mechanics, probability, statistics, and how to evaluate observed patterns."
+  },
+  "hero": {
+    "eyebrow": "A NEW PERSPECTIVE ON WINGO",
+    "firstLine": "Look closer.",
+    "secondLine": "Think in",
+    "emphasis": "numbers.",
+    "description": "There’s more to a result than a number. Learn the mechanics, question the patterns, and explore the mathematics behind WinGo."
+  },
+  "course": {
+    "url": "#course",
+    "buttonLabel": "Visit course",
+    "cardButtonLabel": "Explore the course outline",
+    "closingButtonLabel": "Discover the course",
+    "status": "Enrollment details coming soon.",
+    "enrollmentAnswer": "The course is being developed. Enrollment details, pricing, and access information will be shared when available.",
+    "accessAnswer": "For the initial launch, lessons will be shared privately through Google Drive. After payment is confirmed, we’ll grant Viewer access to the Google account you provide. You’ll need to sign in with that account to watch."
+  },
+  "theme": {
+    "forest": "#082f27",
+    "gold": "#e9cc86",
+    "cream": "#f8f7f1"
+  },
+  "motion": {
+    "scrollReveals": true,
+    "floatingArtwork": true,
+    "chartAnimation": true,
+    "smoothScroll": true,
+    "readingProgress": true
+  }
+}

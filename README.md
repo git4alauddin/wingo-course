@@ -18,7 +18,22 @@ npm test
 npm run build
 ```
 
-The build copies public files to `dist/`; it does not deploy. Browser checks require local Chrome or Edge (or `CHROME_PATH`) and save screenshots in ignored `preview/`.
+The build renders the configured page and copies public files to `dist/`; it does not deploy. Browser checks require local Chrome or Edge (or `CHROME_PATH`) and save screenshots in ignored `preview/`.
+
+## Two configuration files
+
+| File | Controls |
+| --- | --- |
+| [`config/disclosures.json`](config/disclosures.json) | Education-only notice, hero/footer disclaimers, illustration labels, history caveats, and transparency FAQ answers. |
+| [`config/site.json`](config/site.json) | Brand, page title/description, hero copy, course destination and button labels, enrollment/access information, core colors, and motion switches. |
+
+Edit the JSON values and save. Refresh the local site to see changes; no server restart is needed. For a hosted site, rebuild and deploy. Disclosures are rendered into HTML and remain readable without JavaScript. Values are plain text, not HTML. Both files contain public-facing settings; keep credentials and private lesson access tokens out of them.
+
+Set `course.url` to a full `https://...` URL when ready; it updates all four main course buttons. The default `#course` leads to the course overview. Navigation and secondary curriculum links stay on the page. Update `status`, `enrollmentAnswer`, and `accessAnswer` to match the actual enrollment process.
+
+Colors accept six-digit hex values. Motion switches accept `true` or `false`; visitors' reduced-motion preferences always take priority. Curriculum paragraphs and layout remain in `index.html` to keep configuration compact. That source file is now a template; use `npm start` rather than opening it directly.
+
+For **Cloudflare Pages**, use build command `npm run build` and output directory **`dist`**. Deploy the generated `dist/` contents rather than the raw template. Configuration files and development tools are not copied into the public build.
 
 ## Content and behavior
 

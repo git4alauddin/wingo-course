@@ -11,7 +11,7 @@
 .header {
   position: sticky;
   top: 0;
-  background: #082f27f5;
+  background: color-mix(in srgb, var(--forest) 97%, transparent);
   backdrop-filter: blur(18px);
   box-shadow: 0 4px 22px #03241b08;
 }
@@ -98,11 +98,12 @@ nav > a[aria-current='location']::after { transform: scaleX(1); }
 .hero-result-run .ball { width: 27px; font-size: 14px; }
 .insight-card > p { border: none; padding-top: 3px; }
 .gold {
-  background: linear-gradient(120deg, #efdaa3, #e7c67c);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--gold) 75%, white), var(--gold));
   box-shadow: 0 5px 18px #061b1b15, inset 0 1px 0 #fff5;
   border: 1px solid #ffe8a130;
 }
 .gold:hover { box-shadow: 0 8px 24px #d6b66e29, inset 0 1px 0 #fff6; }
+.gold:hover { background: color-mix(in srgb, var(--gold) 80%, white); }
 .gold > span { transition: translate .2s ease; }
 .gold:hover > span { translate: 2px -2px; }
 
@@ -225,7 +226,7 @@ nav > a[aria-current='location']::after { transform: scaleX(1); }
   .table-size { padding: 2px 5px; font-size: 7px; min-width: 33px; }
 }
 @media (max-width: 600px) {
-  .header { background: #082f27fa; }
+  .header { background: color-mix(in srgb, var(--forest) 99%, transparent); }
   nav > a:not(.button)::after { bottom: 7px; right: auto; width: 20px; height: 1px; }
   .hero { padding-top: 33px; }
   .hero-subject { font-size: 7px; gap: 8px; }
@@ -268,4 +269,38 @@ nav > a[aria-current='location']::after { transform: scaleX(1); }
   .gold:hover > span { translate: none; }
   .js-motion .perspective-art.is-visible .chart-line,
   .js-motion .perspective-art.is-visible .chart-points { animation: none; }
+}
+
+/* Public disclosure copy is rendered into HTML, including without JavaScript. */
+.education-notice {
+  display: grid;
+  grid-template-columns: 145px 1fr;
+  gap: 25px;
+  align-items: start;
+  border-top: 1px solid var(--line);
+  padding-block: 25px 35px;
+  margin-bottom: 15px;
+}
+.education-notice > strong {
+  color: #4e6f44;
+  font-size: 13px;
+  font-weight: 600;
+}
+.education-notice > p {
+  color: #64715d;
+  font-size: 11px;
+  line-height: 1.9;
+  margin: 0;
+  max-width: 810px;
+}
+
+/* Optional motion settings are independent; reduced-motion always wins. */
+html[data-floating-artwork='false'] .specimen { animation: none; }
+html[data-chart-animation='false'] .perspective-art.is-visible .chart-line,
+html[data-chart-animation='false'] .perspective-art.is-visible .chart-points { animation: none; }
+html[data-smooth-scroll='false'] { scroll-behavior: auto; }
+html[data-reading-progress='false'] .reading-progress { display: none; }
+@media (max-width: 600px) {
+  .education-notice { grid-template-columns: 1fr; gap: 10px; padding-block: 22px 30px; }
+  .education-notice > p { font-size: 10px; }
 }
